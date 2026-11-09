@@ -1,0 +1,26 @@
+name: Prod - Build y Publish UI
+
+on:
+  push:
+    branches:
+      - prod
+
+jobs:
+  build_and_push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Log in to GitHub Container Registry
+        run: echo "${{ github.token }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Build and Push Docker Image
+        run: |
+          IMAGE=ghcr.io/ing-sis-grupo10/printscript-ui
+          TAG=prod
+          docker build -t $IMAGE:$TAG .
+          docker push $IMAGE:$TAG
